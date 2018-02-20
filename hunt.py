@@ -10,22 +10,41 @@ def guess(buf, char_offset, search_string):
         if(juiced != search_string[i]):
             return False
 
-    print('Offset is probably', char_offset)
+    print('Offset could be %d:' % char_offset)
+
     return True
+
+def safe_print(maybe_illegal, char_offset):
+    for i in range(len(maybe_illegal)):
+        val = ord(maybe_illegal[i]) + char_offset
+        if val >= 65 and val <= 127:
+            # seems ok
+            sys.stdout.write(chr(val))
+        else:
+            sys.stdout.write('?')
+    print '' # newline
 
 def hunt(filename, search_string):
     attempts = 0
-    print('Looking for ' + search_string + ' in ' + filename + '\n')
+
+    print('Looking for %s in %s' % (search_string, filename))
+
     with open(filename, "rb") as f:
         for char_offset in range(-256,256):
+
             while True:
                 buf = f.read(len(search_string))
                 if not buf:
-                    print 'Done with char_offset = %d' % char_offset
+                    #print 'Done with char_offset = %d' % char_offset
                     break
                 attempts += 1
                 if guess(buf, char_offset, search_string):
-                    print('We found the offset!')
+                    #print('We found the offset!')
+
+                    # let's print out the buf + some more
+                    some_more = f.read(20)
+                    safe_print(buf + some_more, char_offset)
+
                     break
                     # reset the file pointer for another read
             f.seek(0)
