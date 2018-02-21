@@ -35,12 +35,10 @@ def hunt(filename, search_string):
             while True:
                 buf = f.read(len(search_string))
                 if not buf:
-                    #print 'Done with char_offset = %d' % char_offset
+                    # eof
                     break
                 attempts += 1
                 if guess(buf, char_offset, search_string):
-                    #print('We found the offset!')
-
                     # let's print out the buf + some more
                     some_more = f.read(20)
                     safe_print(buf + some_more, char_offset)
