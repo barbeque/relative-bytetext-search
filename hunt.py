@@ -1,19 +1,5 @@
 import sys
 
-def guess(buf, char_offset, search_string):
-    if len(buf) != len(search_string):
-        print('Guess and actual have different lengths, bailing early')
-        return False
-
-    for i in range(0, len(search_string)):
-        juiced = chr((ord(buf[i]) + char_offset) % 256)
-        if(juiced != search_string[i]):
-            return False
-
-    print('Offset could be %d:' % char_offset)
-
-    return True
-
 def safe_print(maybe_illegal, char_offset):
     sys.stdout.write('%d: ' % char_offset)
 
@@ -26,7 +12,7 @@ def safe_print(maybe_illegal, char_offset):
             sys.stdout.write('?')
     print '' # newline
 
-def get_waveform(search_string):
+def get_pattern(search_string):
     result = [0] * len(search_string)
     for i in range(len(search_string)):
         result[i] = ord(search_string[i]) - ord(search_string[0])
@@ -47,7 +33,7 @@ def hunt(filename, search_string):
     attempts = 0
 
     print('Looking for "%s" in %s' % (search_string, filename))
-    pattern = get_waveform(search_string)
+    pattern = get_pattern(search_string)
 
     with open(filename, "rb") as f:
         while True:
@@ -71,13 +57,10 @@ def hunt(filename, search_string):
 
     print('Total attempts: %d' % attempts)
 
-# FIXME: do this in a 'signal' approach (relative offset from c[i+1] to c[1])
-# so it's faster
-
-assert get_waveform('foobar')[0] == 0
-assert get_waveform('abcdef') == [0, 1, 2, 3, 4, 5]
-assert string_matches_pattern('light', get_waveform('light'))
-assert string_matches_pattern('light', get_waveform('LIGHT'))
-assert string_matches_pattern('mjhiu', get_waveform('light'))
+assert get_pattern('foobar')[0] == 0
+assert get_pattern('abcdef') == [0, 1, 2, 3, 4, 5]
+assert string_matches_pattern('light', get_pattern('light'))
+assert string_matches_pattern('light', get_pattern('LIGHT'))
+assert string_matches_pattern('mjhiu', get_pattern('light'))
 
 if __name__ == '__main__': hunt(sys.argv[1], ' '.join(sys.argv[2:]))
